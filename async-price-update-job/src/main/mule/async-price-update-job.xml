@@ -30,7 +30,11 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 				</db:update>
 			</foreach>
 		</async>
-		<set-payload value='#[output application/json&#10;---&#10;{&#10;	"Status":"Request accepted"&#10;}]' doc:name="Set Payload" doc:id="110b0333-eae9-49e4-944f-6c2db1b16740" mimeType="application/json"/>
+		<set-payload value='#[output application/json
+---
+{
+	"Status":"Request accepted"
+}]' doc:name="Set Payload" doc:id="110b0333-eae9-49e4-944f-6c2db1b16740" mimeType="application/json"/>
 	</flow>
 	<flow name="async-price-update-jobFlow-select" doc:id="63b2225d-f3e6-48d6-8dc5-563015420051" >
 		<http:listener doc:name="Listener" doc:id="a4e84b4e-f316-4880-b865-e66efec587a9" config-ref="HTTP_Listener_config" path="/select"/>
@@ -52,7 +56,11 @@ payload]]></ee:set-payload>
 		<os:store doc:name="Store" doc:id="eda7adfe-9224-4ff7-a976-009c7d506a96" key="#[payload.key]" objectStore="Object_store">
 			<os:value ><![CDATA[#[payload.callback]]]></os:value>
 		</os:store>
-		<set-payload value='#[output application/json&#10;---&#10;{&#10;	"Status":"API registered"&#10;}]' doc:name="Set Payload" doc:id="6348e2ee-6507-4cea-9f8d-56959840f33d" mimeType="application/json" />
+		<set-payload value='#[output application/json
+---
+{
+	"Status":"API registered"
+}]' doc:name="Set Payload" doc:id="6348e2ee-6507-4cea-9f8d-56959840f33d" mimeType="application/json" />
 	</flow>
 	<flow name="async-price-update-jobFlow-keys" doc:id="e1fced4e-8ff0-4683-8758-ba615116a728" >
 		<http:listener doc:name="Listener" doc:id="5fa63d7e-0695-408b-99d0-d8431680342e" config-ref="HTTP_Listener_config" path="/keys"/>
@@ -70,6 +78,10 @@ payload]]></ee:set-payload>
 		<http:listener doc:name="Listener" doc:id="80201eea-2dc9-4dba-98ae-243014722a76" config-ref="HTTP_Listener_config" path="//delete" />
 		<logger level="INFO" doc:name="Logger" doc:id="979c9db1-8807-4718-bf4b-31b5c7e04831" message='#["Key:" ++ payload.key ++ " stored."]' />
 		<os:remove doc:name="Remove" doc:id="1ae358a5-9cf0-4723-a6ca-01f2f64b3c7c" key="#[payload.key]" objectStore="Object_store"/>
-		<set-payload value='#[output application/json&#10;---&#10;{&#10;	"Status":"API removed"&#10;}]' doc:name="Set Payload" doc:id="f63fa935-1627-442e-93a7-b60ec5ba1fe8" mimeType="application/json" />
+		<set-payload value='#[output application/json
+---
+{
+	"Status":"API removed"
+}]' doc:name="Set Payload" doc:id="f63fa935-1627-442e-93a7-b60ec5ba1fe8" mimeType="application/json" />
 	</flow>
 </mule>
