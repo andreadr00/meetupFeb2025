@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="0476d0d6-5003-4c50-8f90-16ad0c288e20" >
+		<db:generic-connection url="jdbc:sqlite:${mule.home}/apps/${app.name}/DB_Meetup_MuleSoft.db" driverClassName="org.sqlite.JDBC" />
+	</db:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="66fae429-607b-4713-8314-bd2829f8f811" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="a48f321f-1fdc-4263-9d31-2d7ab183ee55" >
+		<http:request-connection protocol="HTTPS" host="async-price-update-job-6njjax.5sc6y6-1.usa-e2.cloudhub.io" port="443" />
+	</http:request-config>
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="e0d827c0-b6bb-46e5-bb89-9cb8325c7938" >
+		<vm:queues >
+			<vm:queue queueName="callbackQueue" queueType="PERSISTENT" />
+			<vm:queue queueName="callbackDLQ" queueType="PERSISTENT" />
+		</vm:queues>
+	</vm:config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="e0e896cd-bf9a-47ce-9579-a20fc7357230" />
+	<flow name="client-price-update-1Flow-select" doc:id="63b2225d-f3e6-48d6-8dc5-563015420051" >
+		<http:listener doc:name="Listener" doc:id="a4e84b4e-f316-4880-b865-e66efec587a9" config-ref="HTTP_Listener_config" path="/select"/>
+		<http:request method="GET" doc:name="Request" doc:id="b17c6185-6660-4c0f-836a-393bf40ac7be" config-ref="HTTP_Request_configuration" path="/select"/>
+		<ee:transform doc:name="Transform Message" doc:id="e0b476b3-8df0-417e-aa1e-98864958b849" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="client-price-update-1Flow-register" doc:id="8635fd3e-6112-4b22-ae78-097457d951e1" >
+		<http:listener doc:name="Listener" doc:id="3f1bc554-0939-4c7d-9ad6-98eb3f1d4803" config-ref="HTTP_Listener_config" path="/register" />
+		<http:request method="POST" doc:name="Request" doc:id="acdd1ac9-7784-457e-b39a-3fdfccdda6c5" config-ref="HTTP_Request_configuration" path="/select" >
+			<http:body ><![CDATA[#[output application/json
+---
+{
+    "key":Mule::p('app.name'),
+    "callback":"https://client-price-update-1-6njjax.5sc6y6-1.usa-e2.cloudhub.io/callback"
+}]]]></http:body>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="d10b6cd8-0474-495f-aed8-7e29f2066afd" message="#[&quot;Key:&quot; ++ Mule::p('app.name') ++ &quot; stored.&quot;]" />
+		<set-payload value='#[output application/json&#10;---&#10;{&#10;	"Status":"API registered"&#10;}]' doc:name="Set Payload" doc:id="6348e2ee-6507-4cea-9f8d-56959840f33d" mimeType="application/json" />
+	</flow>
+	<flow name="client-price-update-1Flow-delete" doc:id="b0dce98d-42bc-4408-a0d5-468643c9b7f0" >
+		<http:listener doc:name="Listener" doc:id="80201eea-2dc9-4dba-98ae-243014722a76" config-ref="HTTP_Listener_config" path="/delete" />
+		<http:request method="POST" doc:name="Request" doc:id="4e5fbb68-fa26-4e3f-b5ca-5c86644e9c5d" config-ref="HTTP_Request_configuration" path="/select">
+			<http:body><![CDATA[#[output application/json
+---
+{
+    "key":Mule::p('app.name'),
+}]]]></http:body>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="83a82343-be0d-43e2-bd2e-558f642e37e7" message="#[&quot;Key:&quot; ++ Mule::p('app.name') ++ &quot; deleted.&quot;]" />
+		<set-payload value='#[output application/json&#10;---&#10;{&#10;	"Status":"API removed"&#10;}]' doc:name="Set Payload" doc:id="f63fa935-1627-442e-93a7-b60ec5ba1fe8" mimeType="application/json" />
+	</flow>
+	<flow name="client-price-update-1Flow-callback-acquisition" doc:id="8d6e08d5-5379-4b5e-9299-fc64c857e048" >
+		<http:listener doc:name="Listener" doc:id="a0e53d32-1538-4673-bbda-e7ec5ec8910f" config-ref="HTTP_Listener_config" path="/callback" />
+		<logger level="INFO" doc:name="Logger" doc:id="552638ed-6883-499b-8013-e2238040c675" message='#["Started acquisition flow with correlationID: " ++ correlationId]'/>
+		<vm:publish queueName="callbackQueue" doc:name="Publish" doc:id="e3a839fb-c013-4e4f-a7d2-8dadc492a48d" config-ref="VM_Config" />
+		<set-payload value='#[output application/json&#10;---&#10;{&#10;	"Status":"Callback received"&#10;}]' doc:name="Set Payload" doc:id="cbf990a0-9125-4b05-be80-f0784a3d95b3" mimeType="application/json" />
+	</flow>
+	<flow name="client-price-update-1Flow-callback-executionFlow" doc:id="8a56dd82-ac0f-4f21-9402-69eca53a9c35" >
+		<vm:listener queueName="callbackQueue" doc:name="Listener" doc:id="77535640-b377-4bd3-adc5-22ec62fa34eb" config-ref="VM_Config" >
+			<redelivery-policy objectStore="Object_store" />
+		</vm:listener>
+		<http:request method="GET" doc:name="Request" doc:id="df3a8149-774e-4b8c-b278-4d36455c8a87" config-ref="HTTP_Request_configuration" path="/select" />
+		<logger level="INFO" doc:name="Logger" doc:id="f5a618f9-493b-4f4b-942a-3e7a7eb58d92" message='#[output application/json&#10;---&#10;"Retrieved updated price :" ++ write(payload,"application/json")]'/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="639de04b-8167-4d89-b673-bbd0d545b681" type=" MULE:REDELIVERY_EXHAUSTED" >
+				<vm:publish queueName="callbackDLQ" doc:name="Publish" doc:id="60c201ee-23ef-40a7-bd8e-61d3c8a710a0" config-ref="VM_Config" />
+				<logger level="INFO" doc:name="Logger" doc:id="e5fbaee6-f39a-4d06-b27b-1e3fcc1b744c" message='#["Published in DLQ: " ++ payload.^raw]' />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="client-price-update-1Flow-dlq" doc:id="a61dbb5f-bff5-4a3c-887e-1ae6cf8853a3" >
+		<vm:listener queueName="callbackDLQ" doc:name="Listener" doc:id="bab5603a-9a77-4dff-aaa2-bcf36baf924f" config-ref="VM_Config" />
+		<logger level="INFO" doc:name="Logger" doc:id="6261639f-e159-4072-b303-11ef62619375" message='#["Message was in DLQ: " ++ payload.^raw]' />
+	</flow>
+</mule>
