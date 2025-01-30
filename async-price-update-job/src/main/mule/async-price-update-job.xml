@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
-http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 	<db:config name="Database_Config" doc:name="Database Config" doc:id="0476d0d6-5003-4c50-8f90-16ad0c288e20" >
 		<db:generic-connection url="jdbc:sqlite:${mule.home}/apps/${app.name}/DB_Meetup_MuleSoft.db" driverClassName="org.sqlite.JDBC" />
 	</db:config>
@@ -15,26 +16,58 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
 	<os:object-store name="Object_store" doc:name="Object store" doc:id="4dc902bc-be68-458d-9517-6bcf36eeac1a" />
-	<flow name="async-price-update-jobFlow-update" doc:id="2e9b0e2d-0bff-4cb6-95c9-f9b78d48db7c" >
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="78e281c2-46d8-42ab-89bd-f5c82ae57cbe" >
+		<vm:queues >
+			<vm:queue queueName="updateQueue" queueType="PERSISTENT" />
+			<vm:queue queueName="updateDLQ" queueType="PERSISTENT" />
+		</vm:queues>
+	</vm:config>
+	<flow name="async-price-update-jobFlow-update-acquisitionFlow" doc:id="2e9b0e2d-0bff-4cb6-95c9-f9b78d48db7c" >
 		<http:listener doc:name="Listener" doc:id="5455c35f-3829-4c0c-ae28-2a34604dee4f" config-ref="HTTP_Listener_config" path="/update" allowedMethods="POST"/>
 		<logger level="INFO" doc:name="Logger" doc:id="671d807c-0934-4313-b549-76e4b6392c1a" />
-		<async doc:name="Async" doc:id="dfbf7628-9117-4ade-a8f0-31b8ae3a11f0" >
-			<foreach doc:name="For Each" doc:id="deeb1dc4-bfc1-4db7-8b66-dadb4f218180" collection="#[payload.UpdateList]">
-				<logger level="INFO" doc:name="Logger" doc:id="70e61390-81da-4d79-83fa-14b1acc73035" message='#["Start update product: " ++ payload.^raw]' />
-				<db:update doc:name="Update" doc:id="de60832b-db3f-4796-adba-9c02540d9023" config-ref="Database_Config">
-					<db:sql ><![CDATA[UPDATE Product SET Price=:newPrice WHERE ID=:id]]></db:sql>
-					<db:input-parameters ><![CDATA[#[{
-	"id":payload.id,
-	"newPrice":payload.price
-}]]]></db:input-parameters>
-				</db:update>
-			</foreach>
-		</async>
+		<vm:publish doc:name="Publish" doc:id="0af4c885-21b4-4732-b2ea-67033b6e7b9b" config-ref="VM_Config" queueName="updateQueue"/>
 		<set-payload value='#[output application/json
 ---
 {
 	"Status":"Request accepted"
 }]' doc:name="Set Payload" doc:id="110b0333-eae9-49e4-944f-6c2db1b16740" mimeType="application/json"/>
+	</flow>
+	<flow name="async-price-update-jobFlow-update-executionFlow" doc:id="b37d4fd7-6d0f-4389-9ef2-02253e2f655b" >
+		<vm:listener doc:name="Listener" doc:id="968757b6-056c-4346-9868-497a3f97f3a0" config-ref="VM_Config" queueName="updateQueue">
+			<redelivery-policy objectStore="Object_store" />
+		</vm:listener>
+		<try doc:name="Try" doc:id="2d87f3e1-ee23-4341-9944-a4728911fa8b" transactionalAction="BEGIN_OR_JOIN">
+			<foreach doc:name="For Each" doc:id="deeb1dc4-bfc1-4db7-8b66-dadb4f218180" collection="#[payload.UpdateList]">
+				<logger level="INFO" doc:name="Logger" doc:id="70e61390-81da-4d79-83fa-14b1acc73035" message='#["Start update product: " ++ payload.^raw]' />
+				<db:update doc:name="Update" doc:id="de60832b-db3f-4796-adba-9c02540d9023" config-ref="Database_Config" target="resultDB">
+					<db:sql><![CDATA[UPDATE Product SET Price=:newPrice WHERE ID=:id]]></db:sql>
+					<db:input-parameters><![CDATA[#[{
+	"id":payload.id,
+	"newPrice":payload.price
+}]]]></db:input-parameters>
+				</db:update>
+				<choice doc:name="Choice" doc:id="8e724fd9-235e-474c-86b6-5bc415c1dd17" >
+					<when expression="#[vars.counter==3]">
+						<raise-error doc:name="Raise error" doc:id="b31558d8-65b8-4b44-8a30-8567336e9efb" type="ERROR:CUSTOM"/>
+					</when>
+				</choice>
+			</foreach>
+			<error-handler>
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="bf7996fa-da68-44a3-9834-d5701350a9ff" type="ANY">
+					<logger level="INFO" doc:name="Logger" doc:id="ce7885e3-4c8c-4150-8a53-094c09343246" message='#["Error in DB: " ++ payload.^raw]' />
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="35644ea7-64bd-47f1-9d14-7716300f405d" type=" MULE:REDELIVERY_EXHAUSTED">
+				<vm:publish queueName="updateDLQ" doc:name="Publish" doc:id="5a86915c-05c2-4dbd-af63-3802682cd015" config-ref="VM_Config"/>
+				<logger level="INFO" doc:name="Logger" doc:id="7b153bb8-9645-4902-923e-7bb5de71274d" message='#["Published in DLQ: " ++ payload.^raw]' />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="async-price-update-jobFlow-dlq" doc:id="79044bbc-7443-46e0-ba9d-498a88e603f8" >
+		<vm:listener queueName="updateDLQ" doc:name="Listener" doc:id="84ba2187-9634-47dd-974f-d2489236e710" config-ref="VM_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="31ad9b40-260c-4707-a86b-6c735dc70e6c" message='#["Message was in DLQ: " ++ payload.^raw]' />
 	</flow>
 	<flow name="async-price-update-jobFlow-select" doc:id="63b2225d-f3e6-48d6-8dc5-563015420051" >
 		<http:listener doc:name="Listener" doc:id="a4e84b4e-f316-4880-b865-e66efec587a9" config-ref="HTTP_Listener_config" path="/select"/>
