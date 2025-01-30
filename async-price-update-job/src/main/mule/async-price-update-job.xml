@@ -52,6 +52,19 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 					</when>
 				</choice>
 			</foreach>
+			<os:retrieve-all-keys doc:name="Retrieve all keys" doc:id="6342b7f7-3037-42e7-8eaf-a3ff6ec70421" objectStore="Object_store" />
+			<foreach doc:name="For Each" doc:id="98fdcebe-ef1f-46ed-8286-1277fd1cc54a" collection="#[payload]">
+				<logger level="INFO" doc:name="Logger" doc:id="12aa7410-f392-4e60-9c33-910a9525cd13" message='#["Callback to " ++ payload]'/>
+				<os:retrieve doc:name="Retrieve" doc:id="85d91ff4-91e7-4857-8571-b7c5057d132e" key="#[payload]" objectStore="Object_store">
+					<os:default-value ><![CDATA[#[""]]]></os:default-value>
+				</os:retrieve>
+				<try doc:name="Try" doc:id="935436ba-d9c4-4285-8b5a-d93deb634107" >
+					<http:request method="GET" doc:name="Request" doc:id="736b767e-f079-4a35-a87f-9d9e16d1433f" url="#[payload]" />
+					<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0f47b4e8-8874-496f-b055-d0483df1731e" type="ANY"/>
+					</error-handler>
+				</try>
+			</foreach>
 			<error-handler>
 				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="bf7996fa-da68-44a3-9834-d5701350a9ff" type="ANY">
 					<logger level="INFO" doc:name="Logger" doc:id="ce7885e3-4c8c-4150-8a53-094c09343246" message='#["Error in DB: " ++ payload.^raw]' />
@@ -109,7 +122,7 @@ payload]]></ee:set-payload>
 	</flow>
 	<flow name="async-price-update-jobFlow-delete" doc:id="b0dce98d-42bc-4408-a0d5-468643c9b7f0" >
 		<http:listener doc:name="Listener" doc:id="80201eea-2dc9-4dba-98ae-243014722a76" config-ref="HTTP_Listener_config" path="//delete" />
-		<logger level="INFO" doc:name="Logger" doc:id="979c9db1-8807-4718-bf4b-31b5c7e04831" message='#["Key:" ++ payload.key ++ " stored."]' />
+		<logger level="INFO" doc:name="Logger" doc:id="979c9db1-8807-4718-bf4b-31b5c7e04831" message='#["Key:" ++ payload.key ++ " deleted."]' />
 		<os:remove doc:name="Remove" doc:id="1ae358a5-9cf0-4723-a6ca-01f2f64b3c7c" key="#[payload.key]" objectStore="Object_store"/>
 		<set-payload value='#[output application/json
 ---
