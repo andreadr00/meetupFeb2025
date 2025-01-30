@@ -53,6 +53,11 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 				</choice>
 			</foreach>
 			<os:retrieve-all-keys doc:name="Retrieve all keys" doc:id="6342b7f7-3037-42e7-8eaf-a3ff6ec70421" objectStore="Object_store" />
+			<choice doc:name="Choice" doc:id="6cec8297-d82e-4dd3-a059-af814bd6d2e1" >
+				<when expression="#[isEmpty(payload)]">
+					<logger level="INFO" doc:name="Logger" doc:id="b1e902d0-42b5-41de-a057-32f735b41066" message="No keys in OS"/>
+				</when>
+			</choice>
 			<foreach doc:name="For Each" doc:id="98fdcebe-ef1f-46ed-8286-1277fd1cc54a" collection="#[payload]">
 				<logger level="INFO" doc:name="Logger" doc:id="12aa7410-f392-4e60-9c33-910a9525cd13" message='#["Callback to " ++ payload]'/>
 				<os:retrieve doc:name="Retrieve" doc:id="85d91ff4-91e7-4857-8571-b7c5057d132e" key="#[payload]" objectStore="Object_store">
@@ -84,6 +89,7 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 	</flow>
 	<flow name="async-price-update-jobFlow-select" doc:id="63b2225d-f3e6-48d6-8dc5-563015420051" >
 		<http:listener doc:name="Listener" doc:id="a4e84b4e-f316-4880-b865-e66efec587a9" config-ref="HTTP_Listener_config" path="/select"/>
+		<logger level="INFO" doc:name="Logger" doc:id="2fb07a1b-d251-45ac-8ad8-85ac37f0b2e0" message="Starting flow select" />
 		<db:select doc:name="Select" doc:id="fb54e222-dad8-4cc0-9e40-434a6caa588e" config-ref="Database_Config">
 			<db:sql ><![CDATA[Select * from Product]]></db:sql>
 		</db:select>
@@ -98,6 +104,7 @@ payload]]></ee:set-payload>
 	</flow>
 	<flow name="async-price-update-jobFlow-register" doc:id="8635fd3e-6112-4b22-ae78-097457d951e1" >
 		<http:listener doc:name="Listener" doc:id="3f1bc554-0939-4c7d-9ad6-98eb3f1d4803" config-ref="HTTP_Listener_config" path="/register" />
+		<logger level="INFO" doc:name="Logger" doc:id="fb28b1de-6640-4c6d-a4a4-6391480b24ba" message="Starting flow register"/>
 		<logger level="INFO" doc:name="Logger" doc:id="d10b6cd8-0474-495f-aed8-7e29f2066afd" message='#["Key:" ++ payload.key ++ " stored."]'/>
 		<os:store doc:name="Store" doc:id="eda7adfe-9224-4ff7-a976-009c7d506a96" key="#[payload.key]" objectStore="Object_store">
 			<os:value ><![CDATA[#[payload.callback]]]></os:value>
@@ -110,7 +117,13 @@ payload]]></ee:set-payload>
 	</flow>
 	<flow name="async-price-update-jobFlow-keys" doc:id="e1fced4e-8ff0-4683-8758-ba615116a728" >
 		<http:listener doc:name="Listener" doc:id="5fa63d7e-0695-408b-99d0-d8431680342e" config-ref="HTTP_Listener_config" path="/keys"/>
+		<logger level="INFO" doc:name="Logger" doc:id="af94f645-f67e-487b-987f-330c3c97bf87" message="Starting flow keys" />
 		<os:retrieve-all-keys doc:name="Retrieve all keys" doc:id="cce0beb4-4b65-4e18-8351-aac1c2a1c84f" objectStore="Object_store"/>
+		<choice doc:name="Choice" doc:id="636b9a9c-d126-4794-9b33-ef815badbc8b">
+			<when expression="#[isEmpty(payload)]">
+				<logger level="INFO" doc:name="Logger" doc:id="56c0fd62-1e6a-47ba-bb31-00ab72e2f775" message="No keys in OS" />
+			</when>
+		</choice>
 		<ee:transform doc:name="Transform Message" doc:id="6ef81009-5404-49ee-815e-5bedcb2e24fe" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -122,6 +135,7 @@ payload]]></ee:set-payload>
 	</flow>
 	<flow name="async-price-update-jobFlow-delete" doc:id="b0dce98d-42bc-4408-a0d5-468643c9b7f0" >
 		<http:listener doc:name="Listener" doc:id="80201eea-2dc9-4dba-98ae-243014722a76" config-ref="HTTP_Listener_config" path="//delete" />
+		<logger level="INFO" doc:name="Logger1" doc:id="c18da12b-f910-4fbf-a01b-dfbb3c474a8a" message="Starting flow delete" />
 		<logger level="INFO" doc:name="Logger" doc:id="979c9db1-8807-4718-bf4b-31b5c7e04831" message='#["Key:" ++ payload.key ++ " deleted."]' />
 		<os:remove doc:name="Remove" doc:id="1ae358a5-9cf0-4723-a6ca-01f2f64b3c7c" key="#[payload.key]" objectStore="Object_store"/>
 		<set-payload value='#[output application/json
