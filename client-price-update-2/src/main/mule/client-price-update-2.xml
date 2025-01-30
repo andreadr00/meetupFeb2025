@@ -39,7 +39,7 @@ payload]]></ee:set-payload>
 	</flow>
 	<flow name="client-price-update-2Flow-register" doc:id="8635fd3e-6112-4b22-ae78-097457d951e1" >
 		<http:listener doc:name="Listener" doc:id="3f1bc554-0939-4c7d-9ad6-98eb3f1d4803" config-ref="HTTP_Listener_config" path="/register" />
-		<http:request method="POST" doc:name="Request" doc:id="acdd1ac9-7784-457e-b39a-3fdfccdda6c5" config-ref="HTTP_Request_configuration" path="/select" >
+		<http:request method="POST" doc:name="Request" doc:id="acdd1ac9-7784-457e-b39a-3fdfccdda6c5" config-ref="HTTP_Request_configuration" path="/register" >
 			<http:body ><![CDATA[#[output application/json
 ---
 {
@@ -52,7 +52,7 @@ payload]]></ee:set-payload>
 	</flow>
 	<flow name="client-price-update-2Flow-delete" doc:id="b0dce98d-42bc-4408-a0d5-468643c9b7f0" >
 		<http:listener doc:name="Listener" doc:id="80201eea-2dc9-4dba-98ae-243014722a76" config-ref="HTTP_Listener_config" path="/delete" />
-		<http:request method="POST" doc:name="Request" doc:id="4e5fbb68-fa26-4e3f-b5ca-5c86644e9c5d" config-ref="HTTP_Request_configuration" path="/select">
+		<http:request method="POST" doc:name="Request" doc:id="4e5fbb68-fa26-4e3f-b5ca-5c86644e9c5d" config-ref="HTTP_Request_configuration" path="/delete">
 			<http:body><![CDATA[#[output application/json
 ---
 {

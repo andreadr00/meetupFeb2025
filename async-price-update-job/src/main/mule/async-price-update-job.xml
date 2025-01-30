@@ -134,7 +134,7 @@ payload]]></ee:set-payload>
 		</ee:transform>
 	</flow>
 	<flow name="async-price-update-jobFlow-delete" doc:id="b0dce98d-42bc-4408-a0d5-468643c9b7f0" >
-		<http:listener doc:name="Listener" doc:id="80201eea-2dc9-4dba-98ae-243014722a76" config-ref="HTTP_Listener_config" path="//delete" />
+		<http:listener doc:name="Listener" doc:id="80201eea-2dc9-4dba-98ae-243014722a76" config-ref="HTTP_Listener_config" path="/delete" />
 		<logger level="INFO" doc:name="Logger1" doc:id="c18da12b-f910-4fbf-a01b-dfbb3c474a8a" message="Starting flow delete" />
 		<logger level="INFO" doc:name="Logger" doc:id="979c9db1-8807-4718-bf4b-31b5c7e04831" message='#["Key:" ++ payload.key ++ " deleted."]' />
 		<os:remove doc:name="Remove" doc:id="1ae358a5-9cf0-4723-a6ca-01f2f64b3c7c" key="#[payload.key]" objectStore="Object_store"/>
