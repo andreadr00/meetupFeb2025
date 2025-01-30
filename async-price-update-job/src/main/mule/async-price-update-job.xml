@@ -15,7 +15,7 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="66fae429-607b-4713-8314-bd2829f8f811" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
-	<os:object-store name="Object_store" doc:name="Object store" doc:id="4dc902bc-be68-458d-9517-6bcf36eeac1a" />
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="4dc902bc-be68-458d-9517-6bcf36eeac1a" entryTtl="5" entryTtlUnit="DAYS"/>
 	<vm:config name="VM_Config" doc:name="VM Config" doc:id="78e281c2-46d8-42ab-89bd-f5c82ae57cbe" >
 		<vm:queues >
 			<vm:queue queueName="updateQueue" queueType="PERSISTENT" />
