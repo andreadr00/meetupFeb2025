@@ -15,7 +15,7 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="66fae429-607b-4713-8314-bd2829f8f811" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
-	<os:object-store name="Object_store" doc:name="Object store" doc:id="4dc902bc-be68-458d-9517-6bcf36eeac1a" />
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="4dc902bc-be68-458d-9517-6bcf36eeac1a" entryTtl="5" entryTtlUnit="DAYS"/>
 	<vm:config name="VM_Config" doc:name="VM Config" doc:id="78e281c2-46d8-42ab-89bd-f5c82ae57cbe" >
 		<vm:queues >
 			<vm:queue queueName="updateQueue" queueType="PERSISTENT" />
@@ -34,7 +34,7 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 	</flow>
 	<flow name="async-price-update-jobFlow-update-executionFlow" doc:id="b37d4fd7-6d0f-4389-9ef2-02253e2f655b" >
 		<vm:listener doc:name="Listener" doc:id="968757b6-056c-4346-9868-497a3f97f3a0" config-ref="VM_Config" queueName="updateQueue">
-			<redelivery-policy objectStore="Object_store" />
+			<redelivery-policy objectStore="Object_store" maxRedeliveryCount="3"/>
 		</vm:listener>
 		<try doc:name="Try" doc:id="2d87f3e1-ee23-4341-9944-a4728911fa8b" transactionalAction="BEGIN_OR_JOIN">
 			<foreach doc:name="For Each" doc:id="deeb1dc4-bfc1-4db7-8b66-dadb4f218180" collection="#[payload.UpdateList]">
@@ -115,6 +115,17 @@ payload]]></ee:set-payload>
 	"Status":"API registered"
 }]' doc:name="Set Payload" doc:id="6348e2ee-6507-4cea-9f8d-56959840f33d" mimeType="application/json" />
 	</flow>
+	<flow name="async-price-update-jobFlow-delete" doc:id="b0dce98d-42bc-4408-a0d5-468643c9b7f0">
+		<http:listener doc:name="Listener" doc:id="80201eea-2dc9-4dba-98ae-243014722a76" config-ref="HTTP_Listener_config" path="/delete" />
+		<logger level="INFO" doc:name="Logger1" doc:id="c18da12b-f910-4fbf-a01b-dfbb3c474a8a" message="Starting flow delete" />
+		<logger level="INFO" doc:name="Logger" doc:id="979c9db1-8807-4718-bf4b-31b5c7e04831" message='#["Key:" ++ payload.key ++ " deleted."]' />
+		<os:remove doc:name="Remove" doc:id="1ae358a5-9cf0-4723-a6ca-01f2f64b3c7c" key="#[payload.key]" objectStore="Object_store" />
+		<set-payload value='#[output application/json
+---
+{
+	"Status":"API removed"
+}]' doc:name="Set Payload" doc:id="f63fa935-1627-442e-93a7-b60ec5ba1fe8" mimeType="application/json" />
+	</flow>
 	<flow name="async-price-update-jobFlow-keys" doc:id="e1fced4e-8ff0-4683-8758-ba615116a728" >
 		<http:listener doc:name="Listener" doc:id="5fa63d7e-0695-408b-99d0-d8431680342e" config-ref="HTTP_Listener_config" path="/keys"/>
 		<logger level="INFO" doc:name="Logger" doc:id="af94f645-f67e-487b-987f-330c3c97bf87" message="Starting flow keys" />
@@ -132,16 +143,5 @@ output application/json
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-	</flow>
-	<flow name="async-price-update-jobFlow-delete" doc:id="b0dce98d-42bc-4408-a0d5-468643c9b7f0" >
-		<http:listener doc:name="Listener" doc:id="80201eea-2dc9-4dba-98ae-243014722a76" config-ref="HTTP_Listener_config" path="//delete" />
-		<logger level="INFO" doc:name="Logger1" doc:id="c18da12b-f910-4fbf-a01b-dfbb3c474a8a" message="Starting flow delete" />
-		<logger level="INFO" doc:name="Logger" doc:id="979c9db1-8807-4718-bf4b-31b5c7e04831" message='#["Key:" ++ payload.key ++ " deleted."]' />
-		<os:remove doc:name="Remove" doc:id="1ae358a5-9cf0-4723-a6ca-01f2f64b3c7c" key="#[payload.key]" objectStore="Object_store"/>
-		<set-payload value='#[output application/json
----
-{
-	"Status":"API removed"
-}]' doc:name="Set Payload" doc:id="f63fa935-1627-442e-93a7-b60ec5ba1fe8" mimeType="application/json" />
 	</flow>
 </mule>
