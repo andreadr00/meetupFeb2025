@@ -1,0 +1,846 @@
+{
+	"info": {
+		"_postman_id": "eaf90182-fb48-46fa-b6b7-4e65b7a23d27",
+		"name": "Meetup",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28579022"
+	},
+	"item": [
+		{
+			"name": "Server S",
+			"item": [
+				{
+					"name": "Local",
+					"item": [
+						{
+							"name": "update",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    //sending 3 items we will raise an error, to check the transactional behaviour\n    \"UpdateList\":\n        [\n            {\n                \"id\":1,\n                \"price\":5000\n            },\n                        {\n                \"id\":2,\n                \"price\":5\n            }\n            /*,\n                        {\n                \"id\":2,\n                \"price\":5\n            }*/\n        ]\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/update",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"key\":\"client-price-update-1\",\n    \"callback\":\"https://client-price-update-1-6njjax.5sc6y6-1.usa-e2.cloudhub.io/callback\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "select",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/select",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"select"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "keys",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/keys",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"keys"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"key\":\"app-name2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/delete",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"delete"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "cloudhub",
+					"item": [
+						{
+							"name": "update",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    //sending 3 items we will raise an error, to check the transactional behaviour\n    \"UpdateList\":\n        [\n            {\n                \"id\":1,\n                \"price\":250\n            },\n                        {\n                \"id\":2,\n                \"price\":150\n            }\n            ,\n                        {\n                \"id\":3,\n                \"price\":5\n            }\n        ]\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://async-price-update-job-6njjax.5sc6y6-1.usa-e2.cloudhub.io/update",
+									"protocol": "https",
+									"host": [
+										"async-price-update-job-6njjax",
+										"5sc6y6-1",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"key\":\"app-name2\",\n    \"callback\":\"url1\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://async-price-update-job-6njjax.5sc6y6-1.usa-e2.cloudhub.io/register",
+									"protocol": "https",
+									"host": [
+										"async-price-update-job-6njjax",
+										"5sc6y6-1",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "select",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://async-price-update-job-6njjax.5sc6y6-1.usa-e2.cloudhub.io/select",
+									"protocol": "https",
+									"host": [
+										"async-price-update-job-6njjax",
+										"5sc6y6-1",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"select"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "keys",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://async-price-update-job-6njjax.5sc6y6-1.usa-e2.cloudhub.io/keys",
+									"protocol": "https",
+									"host": [
+										"async-price-update-job-6njjax",
+										"5sc6y6-1",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"keys"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"key\":\"app-name2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://async-price-update-job-6njjax.5sc6y6-1.usa-e2.cloudhub.io/delete",
+									"protocol": "https",
+									"host": [
+										"async-price-update-job-6njjax",
+										"5sc6y6-1",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"delete"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Client C1",
+			"item": [
+				{
+					"name": "Local",
+					"item": [
+						{
+							"name": "register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "select",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/select",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"select"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/delete",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"delete"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "callback",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/callback",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"callback"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "cloudhub",
+					"item": [
+						{
+							"name": "register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://client-price-update-1-6njjax.5sc6y6-1.usa-e2.cloudhub.io/register",
+									"protocol": "https",
+									"host": [
+										"client-price-update-1-6njjax",
+										"5sc6y6-1",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "select",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://client-price-update-1-6njjax.5sc6y6-1.usa-e2.cloudhub.io/select",
+									"protocol": "https",
+									"host": [
+										"client-price-update-1-6njjax",
+										"5sc6y6-1",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"select"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://client-price-update-1-6njjax.5sc6y6-1.usa-e2.cloudhub.io/delete",
+									"protocol": "https",
+									"host": [
+										"client-price-update-1-6njjax",
+										"5sc6y6-1",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"delete"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "callback",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://client-price-update-1-6njjax.5sc6y6-1.usa-e2.cloudhub.io/callback",
+									"protocol": "https",
+									"host": [
+										"client-price-update-1-6njjax",
+										"5sc6y6-1",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"callback"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Client C2",
+			"item": [
+				{
+					"name": "Local",
+					"item": [
+						{
+							"name": "register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "select",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/select",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"select"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/delete",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"delete"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "callback",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/callback",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"callback"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "cloudhub",
+					"item": [
+						{
+							"name": "register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://client-price-update-2-6njjax.5sc6y6-4.usa-e2.cloudhub.io/register",
+									"protocol": "https",
+									"host": [
+										"client-price-update-2-6njjax",
+										"5sc6y6-4",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "select",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://client-price-update-2-6njjax.5sc6y6-4.usa-e2.cloudhub.io/select",
+									"protocol": "https",
+									"host": [
+										"client-price-update-2-6njjax",
+										"5sc6y6-4",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"select"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://client-price-update-2-6njjax.5sc6y6-4.usa-e2.cloudhub.io/delete",
+									"protocol": "https",
+									"host": [
+										"client-price-update-2-6njjax",
+										"5sc6y6-4",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"delete"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "callback",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://client-price-update-2-6njjax.5sc6y6-4.usa-e2.cloudhub.io/callback",
+									"protocol": "https",
+									"host": [
+										"client-price-update-2-6njjax",
+										"5sc6y6-4",
+										"usa-e2",
+										"cloudhub",
+										"io"
+									],
+									"path": [
+										"callback"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
